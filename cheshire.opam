@@ -2,17 +2,15 @@ opam-version: "2.0"
 maintainer: "ericfinster@gmail.com"
 authors: ["Eric Finster"]
 homepage: "https://github.com/ericfinster/cheshire"
+synopsis: "Small monadic library for OCaml"
 bug-reports: "https://github.com/ericfinster/cheshire/issues"
-dev-repo: "https://github.com/ericfinster/cheshire.git"
+dev-repo: "git+https://github.com/ericfinster/cheshire.git"
 
 build: [
   ["dune" "subst"] {pinned}
   ["dune" "build" "-p" name "-j" jobs]
 ]
 
-build-test: ["dune" "runtest" "-p" name]
-
 depends: [
   "dune" {build}
-  "alcotest" {test}
 ]
