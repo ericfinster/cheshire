@@ -11,7 +11,7 @@ end
 module type Monad = sig
   include MonadBase
   include Applicative.ApplicativeBase with type 'a t := 'a t
-  val (>>=) : 'a t -> ('a -> 'b t) -> 'b       
+  val (>>=) : 'a t -> ('a -> 'b t) -> 'b t
   val join : 'a t t -> 'a t
 
   (* module type MonadSyntax = sig
