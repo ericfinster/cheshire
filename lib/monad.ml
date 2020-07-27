@@ -27,7 +27,9 @@ module MakeMonad(M : MonadBase) = struct
         bt >>= fun b ->
         pure (a , b) 
     end)
-  
+
+  include Ap
+      
   module Syntax = struct
     include Ap.Syntax
     let (let*) m f = m >>= f
