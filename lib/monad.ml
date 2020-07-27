@@ -11,27 +11,24 @@ end
 module type Monad = sig
   include MonadBase
   include Applicative.ApplicativeBase with type 'a t := 'a t
+      
   val (>>=) : 'a t -> ('a -> 'b t) -> 'b t
   val join : 'a t t -> 'a t
 
-  (* module type MonadSyntax = sig
-   *   val (let*\) : 'a t -> ('a -> 'b t) -> 'b t
-   * end *)
-  
+  module MonadSyntax : sig
+    val (let*) : 'a t -> ('a -> 'b t) -> 'b t
+  end
+
 end
 
-(* module type MonadSyntax = sig
- *   include MonadBase
- *   val (let*\) : 'a t -> ('a -> 'b t) -> 'b t
- * end *)
-
-module MakeMonad(M : MonadBase) = struct
+module MakeMonad(M : MonadBase) : Monad with type 'a t := 'a M.t = struct
   include M
 
   let ( >>= ) = bind
   let join m = m >>= (fun x -> x)
   
-  module Ap = Applicative.MakeApplicative(struct
+  module Ap : Applicative.ApplicativeBase with type 'a t := 'a t =
+    Applicative.MakeApplicative(struct
       include M
       let product at bt =
         at >>= fun a ->
@@ -41,8 +38,7 @@ module MakeMonad(M : MonadBase) = struct
 
   include Ap
       
-  module Syntax = struct
-    include Ap.Syntax
+  module MonadSyntax = struct
     let (let*) m f = m >>= f
   end
                      

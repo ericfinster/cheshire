@@ -3,23 +3,28 @@
  *)
 
 open Option
+open Monad
     
-module Opt = struct
-  
-  let product o o' =
-    match (o , o') with
-    | Some x , Some y -> Some (x , y)
-    |  _ -> None
-      
+module OptMonad : Monad with type 'a t := 'a option
+  = MakeMonad(struct
 
-  module Syntax =
-  struct
-    let (let+) x f = map f x
-    let (and+) o o' = product o o'
-    let (let*) m f = bind m f
-  end
-  
-end
+    type 'a t = 'a option
+
+    let map f m =
+      match m with
+      | None -> None
+      | Some a -> Some (f a)
+
+    let pure a = Some a
+
+    let bind m f =
+      match m with
+      | None -> None
+      | Some a -> f a
+
+  end)
+
+open OptMonad.MonadSyntax
 
 let head_opt l =
   match l with 
@@ -30,10 +35,8 @@ let tail_opt l =
   match l with
   | [] -> None
   | _::xs -> Some xs 
-
-open Opt.Syntax
        
-let test l =
+let opt_test l =
   let* x = head_opt l in
   let* xs = tail_opt l in
   let* y = head_opt xs in
