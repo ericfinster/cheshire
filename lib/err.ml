@@ -1,13 +1,12 @@
 (*
- * Err.ml - An Error Monad
+ * err.ml - An Error Monad
  *)
 
 type 'a err =
   | Ok of 'a
   | Fail of string
 
-module Err =
-struct
+module Err = struct
 
   (* Bind for the error monad *)
   let ( >>= ) m f =
@@ -26,8 +25,7 @@ struct
     | Ok x -> Ok (f x)
     | Fail s -> Fail s
     
-  module Syntax =
-  struct
+  module Syntax = struct
     let (let+) e f = map e f
     let (and+) e e' = product e e'
     let (let*) m f = m >>= f
