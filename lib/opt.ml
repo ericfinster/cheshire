@@ -24,20 +24,3 @@ module OptMonad : Monad with type 'a t := 'a option
 
   end)
 
-open OptMonad.MonadSyntax
-
-let head_opt l =
-  match l with 
-  | [] -> None
-  | x::_ -> Some x
-
-let tail_opt l =
-  match l with
-  | [] -> None
-  | _::xs -> Some xs 
-       
-let opt_test l =
-  let* x = head_opt l in
-  let* xs = tail_opt l in
-  let* y = head_opt xs in
-  Some (x + y)
