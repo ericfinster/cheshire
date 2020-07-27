@@ -8,8 +8,10 @@ type 'a err =
   | Ok of 'a
   | Fail of string
 
-module ErrMonad : Monad with type 'a t := 'a err =
-  MakeMonad(struct
+module ErrMonad : MonadError
+  with type 'a t := 'a err
+  with type e := string =
+  MakeMonadError(struct
 
     type 'a t = 'a err
         
@@ -25,4 +27,14 @@ module ErrMonad : Monad with type 'a t := 'a err =
       | Ok a -> f a
       | Fail s -> Fail s
                     
+  end)(struct
+
+    type e = string
+
+    let throw s = Fail s
+    let catch m h =
+      match m with
+      | Fail s -> h s
+      | Ok a -> Ok a
+    
   end)

@@ -43,3 +43,33 @@ module MakeMonad(M : MonadBase) : Monad with type 'a t := 'a M.t = struct
   end
                      
 end
+
+(*
+ * Error monads
+ *)
+
+module type MonadErrorBase = sig
+
+  type 'a t
+  type e
+
+  val throw : e -> 'a t 
+  val catch : 'a t -> (e -> 'a t) -> 'a t
+
+end 
+
+module type MonadError = sig
+  include Monad
+  include MonadErrorBase with type 'a t := 'a t
+end
+
+
+module MakeMonadError(M : MonadBase)(E : MonadErrorBase with type 'a t := 'a M.t) : MonadError
+  with type e := E.e
+  with type 'a t := 'a M.t = struct
+
+  module Mnd = MakeMonad(M)
+
+  include Mnd
+  include E
+end
