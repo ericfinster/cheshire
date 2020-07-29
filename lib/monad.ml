@@ -61,6 +61,9 @@ end
 module type MonadError = sig
   include Monad
   include MonadErrorBase with type 'a t := 'a t
+
+  val ensure : bool -> e -> unit t
+      
 end
 
 
@@ -72,4 +75,8 @@ module MakeMonadError(M : MonadBase)(E : MonadErrorBase with type 'a t := 'a M.t
 
   include Mnd
   include E
+
+  let ensure b s =
+    if b then pure () else throw s 
+
 end
