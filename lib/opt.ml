@@ -1,6 +1,8 @@
-(* 
- * opt.ml - Option implementation
- *)
+(*****************************************************************************)
+(*                                                                           *)
+(*                                   Option                                  *)
+(*                                                                           *)
+(*****************************************************************************)
 
 open Option
 open Monad
@@ -23,4 +25,3 @@ module OptMonad : Monad with type 'a t := 'a option
       | Some a -> f a
 
   end)
-

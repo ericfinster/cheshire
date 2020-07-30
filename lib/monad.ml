@@ -1,34 +1,49 @@
-(*
- * monad.ml - monads
- *)
+(*****************************************************************************)
+(*                                                                           *)
+(*                                   Monads                                  *)
+(*                                                                           *)
+(*****************************************************************************)
 
+open Functor
+open Applicative
+    
 module type MonadBase = sig
-  include Functor.Functor
+  include FunctorBase
   val bind : 'a t -> ('a -> 'b t) -> 'b t
   val pure : 'a -> 'a t
 end
 
 module type Monad = sig
   include MonadBase
-  include Applicative.ApplicativeBase with type 'a t := 'a t
+  include Functor with type 'a t := 'a t 
+  include Applicative with type 'a t := 'a t
       
   val (>>=) : 'a t -> ('a -> 'b t) -> 'b t
   val join : 'a t t -> 'a t
 
   module MonadSyntax : sig
+    val (let+) : 'a t -> ('a -> 'b) -> 'b t
+    val (and+) : 'a t -> 'b t -> ('a * 'b) t 
     val (let*) : 'a t -> ('a -> 'b t) -> 'b t
   end
 
 end
 
-module MakeMonad(M : MonadBase) : Monad with type 'a t := 'a M.t = struct
+module MakeMonad(M : MonadBase) : Monad
+  with type 'a t := 'a M.t = struct
+  
   include M
 
   let ( >>= ) = bind
   let join m = m >>= (fun x -> x)
-  
-  module Ap : Applicative.ApplicativeBase with type 'a t := 'a t =
-    Applicative.MakeApplicative(struct
+
+  module F : Functor with type 'a t := 'a t =
+    MakeFunctor(struct
+      include M 
+    end)
+
+  module A : Applicative with type 'a t := 'a t =
+    MakeApplicative(struct
       include M
       let product at bt =
         at >>= fun a ->
@@ -36,9 +51,11 @@ module MakeMonad(M : MonadBase) : Monad with type 'a t := 'a M.t = struct
         pure (a , b) 
     end)
 
-  include Ap
+  include F 
+  include A
       
   module MonadSyntax = struct
+    include A.ApplicativeSyntax
     let (let*) m f = m >>= f
   end
                      

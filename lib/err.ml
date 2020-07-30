@@ -14,7 +14,7 @@ module ErrMonad : MonadError
   MakeMonadError(struct
 
     type 'a t = 'a err
-        
+
     let map f e =
       match e with
       | Ok x -> Ok (f x)
@@ -26,7 +26,7 @@ module ErrMonad : MonadError
       match m with
       | Ok a -> f a
       | Fail s -> Fail s
-                    
+
   end)(struct
 
     type e = string
@@ -36,5 +36,5 @@ module ErrMonad : MonadError
       match m with
       | Fail s -> h s
       | Ok a -> Ok a
-    
+
   end)
