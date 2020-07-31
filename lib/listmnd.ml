@@ -5,7 +5,6 @@
 (*****************************************************************************)
 
 open Monad
-open Traverse
 open Applicative
     
 module ListMonad = MakeMonad(struct
@@ -23,7 +22,7 @@ module ListMonad = MakeMonad(struct
                              
   end)
 
-module ListTraverse(A : Applicative) : Traverse = struct
+module ListTraverse(A : Applicative) = struct
 
   type 'a t = 'a list
   type 'a m = 'a A.t
