@@ -29,8 +29,7 @@ module type Monad = sig
 
 end
 
-module MakeMonad(M : MonadBase) : Monad
-  with type 'a t := 'a M.t = struct
+module MakeMonad(M : MonadBase) = struct
   
   include M
 
@@ -51,7 +50,7 @@ module MakeMonad(M : MonadBase) : Monad
         pure (a , b) 
     end)
 
-  include F 
+  include F
   include A
       
   module MonadSyntax = struct
@@ -80,13 +79,10 @@ module type MonadError = sig
   include MonadErrorBase with type 'a t := 'a t
 
   val ensure : bool -> e -> unit t
-      
 end
 
 
-module MakeMonadError(M : MonadBase)(E : MonadErrorBase with type 'a t := 'a M.t) : MonadError
-  with type e := E.e
-  with type 'a t := 'a M.t = struct
+module MakeMonadError(M : MonadBase)(E : MonadErrorBase with type 'a t := 'a M.t) = struct
 
   module Mnd = MakeMonad(M)
 

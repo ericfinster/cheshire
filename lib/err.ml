@@ -8,10 +8,7 @@ type 'a err =
   | Ok of 'a
   | Fail of string
 
-module ErrMonad : MonadError
-  with type 'a t := 'a err
-  with type e := string =
-  MakeMonadError(struct
+module ErrMonad = MakeMonadError(struct
 
     type 'a t = 'a err
 

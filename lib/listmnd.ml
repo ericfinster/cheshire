@@ -5,11 +5,9 @@
 (*****************************************************************************)
 
 open Monad
-open Traverse
 open Applicative
     
-module ListMonad : Monad with type 'a t := 'a list =
-  MakeMonad(struct
+module ListMonad = MakeMonad(struct
 
     type 'a t = 'a list
 
@@ -24,11 +22,12 @@ module ListMonad : Monad with type 'a t := 'a list =
                              
   end)
 
-module ListTraverse(A : Applicative) : Traverse
-  with type 'a t := 'a list
-  with type 'a m := 'a A.t = struct
+module ListTraverse(A : Applicative) = struct
 
-  open A.ApplicativeSyntax
+  type 'a t = 'a list
+  type 'a m = 'a A.t
+      
+  open A.ApplicativeSyntax 
   
   let rec traverse f l =
     match l with
@@ -37,8 +36,12 @@ module ListTraverse(A : Applicative) : Traverse
       let+ b = f x 
       and+ bs = traverse f xs in
       b::bs
-                 
-end
+      
+  (* let rec traverse f l =
+   *   match l with
+   *   | [] -> pure []
+   *   | x::xs -> pure (fun b bs -> b::bs) <*> f x <*> traverse f xs *)
 
+end
 
 
