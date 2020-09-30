@@ -46,9 +46,25 @@ end
 type ('a,'e) err =
   | Ok of 'a
   | Fail of 'e
-    
+
+module ErrMnd(T: Typ) = struct
+  type 'a m = ('a, T.t) err
+
+  let pure a = Ok a
+  let bind m f =
+    match m with
+    | Ok a -> f a
+    | Fail e -> Fail e
+
+  let throw e = Fail e
+  let try_with m f =
+    match m with
+    | Ok a -> Ok a
+    | Fail e -> f e
+                  
+end
+
 module ErrT(T: Typ)(M: Mnd) = struct
-  (* type 'a err = Ok of 'a | Fail of T.t *)
   type 'a m = (('a, T.t) err) M.m
 
   let pure x = M.pure (Ok x)
