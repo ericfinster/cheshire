@@ -61,7 +61,9 @@ module ErrMnd(T: Typ) = struct
     match m with
     | Ok a -> Ok a
     | Fail e -> f e
-                  
+
+  let (<||>) m n = try_with m (fun _ -> n)
+
 end
 
 module ErrT(T: Typ)(M: Mnd) = struct
