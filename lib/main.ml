@@ -80,6 +80,7 @@ module ApplicativeSyntax(A: Applicative) = struct
 end
 
 module MonadSyntax(M: Mnd) = struct
+  let (>>=) = M.bind
   let (let+) m f = M.bind m (fun a -> M.pure (f a))
   let (and+) x y = M.bind x (fun a -> M.bind y (fun b -> M.pure (a,b)))
   let (let*) m f = M.bind m f      
