@@ -6,6 +6,11 @@ module type Typ = sig
   type t
 end
 
+module type Functor = sig
+  type 'a t
+  val map : ('a -> 'b) -> 'a t -> 'b t
+end
+
 module type Mnd = sig
   type 'a m
   val bind : 'a m -> ('a -> 'b m) -> 'b m
@@ -19,9 +24,7 @@ module type Traverse = sig
 end
 
 module type Applicative = sig
-  type 'a t
-  (* Separate out map? *)
-  val map : ('a -> 'b) -> 'a t -> 'b t
+  include Functor
   val product : 'a t -> 'b t -> ('a * 'b) t 
   val pure : 'a -> 'a t
 end
