@@ -5,11 +5,8 @@
 (*****************************************************************************)
 
 module type Traverse = sig
-
   type 'a t
   type 'a m
-    
   val traverse : ('a -> 'b m) -> 'a t -> 'b t m
-      
 end
 

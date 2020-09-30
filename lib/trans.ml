@@ -12,6 +12,20 @@ module type Mnd = sig
   val pure : 'a -> 'a m
 end
 
+module type Traverse = sig
+  type 'a t
+  type 'a m
+  val traverse : ('a -> 'b m) -> 'a t -> 'b t m
+end
+
+module type Applicative = sig
+  type 'a t
+  (* Separate out map? *)
+  val map : ('a -> 'b) -> 'a t -> 'b t
+  val product : 'a t -> 'b t -> ('a * 'b) t 
+  val pure : 'a -> 'a t
+end
+
 module Identity = struct
   type 'a m = 'a
   let pure x = x
@@ -50,6 +64,21 @@ module ReaderT(T: Typ)(M: Mnd) = struct
 end  
 
 (*****************************************************************************)
+(*                            Syntax Constructors                            *)
+(*****************************************************************************)
+
+module ApplicativeSyntax(A: Applicative) = struct
+    let (let+) a f = A.map f a
+    let (and+) x y = A.product x y
+end
+
+module MonadSyntax(M: Mnd) = struct
+  let (let+) m f = M.bind m (fun a -> M.pure (f a))
+  let (and+) x y = M.bind x (fun a -> M.bind y (fun b -> M.pure (a,b)))
+  let (let*) m f = M.bind m f      
+end
+
+(*****************************************************************************)
 (*                            Examples and Testing                           *)
 (*****************************************************************************)
 
@@ -60,6 +89,3 @@ type inner_env = string
 module Bleep = ReaderT(struct type t = inner_env end)(Identity)
 module Blorp = ErrT(struct type t = err_type end)(Bleep)
 module Blomp = ReaderT(struct type t = outer_env end)(Blorp)
-
-
-
