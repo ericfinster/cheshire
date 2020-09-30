@@ -1,4 +1,5 @@
 (library
  (name cheshire)
  (public_name cheshire)
- (synopsis "Various categorical routines in OCaml"))
+ (synopsis "Various categorical routines in OCaml")
+ (libraries higher))

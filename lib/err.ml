@@ -35,3 +35,33 @@ module ErrMonad = MakeMonadError(struct
       | Ok a -> Ok a
 
   end)
+
+
+module ErrT(M : Monad) = struct
+  type 'a t = ('a err) M.t 
+
+  let pure a = M.pure (Ok a)
+  let bind m f = M.bind m
+      (function Fail s -> M.pure (Fail s)
+              | Ok v -> f v)
+  
+end
+  
+(* module ExceptionTransf(M: MONAD) = struct
+ *   type 'a outcome = V of 'a | E of exn
+ *   type 'a mon = ('a outcome) M.mon
+ * 
+ *   let ret x = M.ret (V x)
+ *   let bind m f = 
+ *     M.bind m (function E e -> M.ret (E e) | V v -> f v)
+ *   let lift x = M.bind x (fun v -> M.ret (V v))
+ * 
+ *   type 'a result = 'a M.result
+ * 
+ *   let run m = M.run (M.bind m (function V x -> M.ret x))
+ * 
+ *   let raise e = M.ret (E e)
+ *   let trywith m f =
+ *     M.bind m (function E e -> f e | V v -> M.ret (V v))
+ * end *)
+

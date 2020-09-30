@@ -80,7 +80,7 @@ module type MonadError = sig
 
   val ensure : bool -> e -> unit t
   val (<||>) : 'a t -> 'a t -> 'a t
-  
+      
 end
 
 
