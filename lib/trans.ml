@@ -25,7 +25,7 @@ module ErrT(T: Typ)(M: Mnd) = struct
   let pure x = M.pure (Ok x)
   let bind m f =
     M.bind m (function
-        | Ok x -> M.pure (f x)
+        | Ok x -> f x
         | Fail s -> M.pure (Fail s))
 
   let lift m = M.bind m (fun x -> M.pure (Ok x))
@@ -53,18 +53,13 @@ end
 (*                            Examples and Testing                           *)
 (*****************************************************************************)
 
-(* type err_type = string
- * type outer_env = int
- * type inner_env = string
- * 
- * module Bleep = ErrT(struct type t = err_type end)(Identity)
- * module Blorp = ReaderT(struct type t = inner_env end)(Bleep)
- * module Blomp = ReaderT(struct type t = outer_env end)(Blorp)
- * 
- * type 'a mnd = 'a Blomp.m
- * let mnd_get_int : int mnd = Blomp.ask
- * let mnd_get_str : string mnd = Blomp.lift Blorp.ask 
- * 
- * let mnd_fail s = Blomp.lift (Blorp.lift (Bleep.throw s))     *)
+type err_type = string
+type outer_env = int
+type inner_env = string
+
+module Bleep = ReaderT(struct type t = inner_env end)(Identity)
+module Blorp = ErrT(struct type t = err_type end)(Bleep)
+module Blomp = ReaderT(struct type t = outer_env end)(Blorp)
+
 
 
