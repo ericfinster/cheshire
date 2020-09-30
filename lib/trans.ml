@@ -26,6 +26,12 @@ module type Applicative = sig
   val pure : 'a -> 'a t
 end
 
+module MndToApp(M: Mnd) = struct
+  let map f m = M.bind m (fun a -> M.pure (f a))
+  let product x y = M.bind x (fun a -> M.bind y (fun b -> M.pure (a,b)))
+  let pure = M.pure
+end
+
 module Identity = struct
   type 'a m = 'a
   let pure x = x
