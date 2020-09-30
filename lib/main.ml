@@ -42,15 +42,20 @@ module Identity = struct
   let bind m f = f m
 end
 
+(* Now this is in global scope ... *)
+type ('a,'e) err =
+  | Ok of 'a
+  | Fail of 'e
+    
 module ErrT(T: Typ)(M: Mnd) = struct
-  type 'a err = Ok of 'a | Fail of T.t
-  type 'a m = ('a err) M.m
+  (* type 'a err = Ok of 'a | Fail of T.t *)
+  type 'a m = (('a, T.t) err) M.m
 
   let pure x = M.pure (Ok x)
   let bind m f =
     M.bind m (function
         | Ok x -> f x
-        | Fail s -> M.pure (Fail s))
+        | Fail e -> M.pure (Fail e))
 
   let lift m = M.bind m (fun x -> M.pure (Ok x))
 
@@ -100,14 +105,3 @@ module type MndErr = sig
   val try_with : 'a m -> (e -> 'a m) -> 'a m
 end
 
-(*****************************************************************************)
-(*                            Examples and Testing                           *)
-(*****************************************************************************)
-
-type err_type = string
-type outer_env = int
-type inner_env = string
-
-module Bleep = ReaderT(struct type t = inner_env end)(Identity)
-module Blorp = ErrT(struct type t = err_type end)(Bleep)
-module Blomp = ReaderT(struct type t = outer_env end)(Blorp)
