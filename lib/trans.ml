@@ -92,7 +92,7 @@ end
 module type MndErr = sig
   include Mnd
   type e
-  val throw : e -> unit m
+  val throw : e -> 'a m
   val try_with : 'a m -> (e -> 'a m) -> 'a m
 end
 
